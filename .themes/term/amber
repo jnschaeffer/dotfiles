@@ -1,0 +1,61 @@
+! --- ~/.Xresources ------------------------------------------------------------
+
+! --- special colors ---
+
+URxvt.background: #0f0902
+URxvt.foreground: #e1953a
+
+! --- standard colors ---
+
+! black
+URxvt.color0: #1a0f03
+
+! bright_black
+URxvt.color8: #3b2408
+
+! red
+URxvt.color1: #bb721c
+
+! bright_red
+URxvt.color9: #db8520
+
+! green
+URxvt.color2: #8e5715
+
+! bright_green
+URxvt.color10: #ae6a19
+
+! yellow
+URxvt.color3: #dd8822
+
+! bright_yellow
+URxvt.color11: #e29943
+
+! blue
+URxvt.color4: #6a400f
+
+! bright_blue
+URxvt.color12: #895314
+
+! magenta
+URxvt.color5: #c97b1e
+
+! bright_magenta
+URxvt.color13: #df8e2e
+
+! cyan
+URxvt.color6: #b66f1b
+
+! bright_cyan
+URxvt.color14: #d6821f
+
+! white
+URxvt.color7: #e1953a
+
+! bright_white
+URxvt.color15: #e6a659
+
+
+! ------------------------------------------------------------------------------
+! --- end of terminal colors section -------------------------------------------
+! ------------------------------------------------------------------------------

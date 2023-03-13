@@ -1,0 +1,8 @@
+#include ".themes/term/meadowlands"
+
+Xcursor.size: 16
+
+URxvt.urgentOnBell: true
+URxvt*pointerShape: arrow
+URxvt*font: -*-terminus-*-*-*-*-*-*-*-*-*-*-*-*
+URxvt*scrollBar: false
