@@ -1,96 +1,96 @@
-;; global setup things
 (require 'package)
-(add-to-list 'package-archives
-	     '("melpa" . "https://melpa.org/packages/"))
-(add-to-list 'package-archives
-	     '("org" . "http://orgmode.org/elpa/") t)
+(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
+;; Comment/uncomment this line to enable MELPA Stable if desired.  See `package-archive-priorities`
+;; and `package-pinned-packages`. Most users will not need or want to do this.
+;;(add-to-list 'package-archives '("melpa-stable" . "https://stable.melpa.org/packages/") t)
 (package-initialize)
 
-(setq geiser-active-implementations '(guile chicken))
-(setq geiser-default-implementation 'guile)
-(setq geiser-chicken-binary "/usr/bin/chicken-csi")
+;; paths
+(setenv "PATH" (concat (getenv "PATH") ":~/go/bin"))
+(setq exec-path (append exec-path '("~/go/bin")))
 
-(setq inferior-lisp-program "/usr/bin/clisp")
-(setq slime-contribs '(slime-fancy))
+;; spellcheck
+(setq ispell-program-name "hunspell")
+(setq ispell-dictionary "en_US")
 
-(column-number-mode)
-(setq-default fill-column 80)
+;; packages
+(use-package project
+  :config
+  (defun project-find-go-module (dir)
+    (when-let ((root (locate-dominating-file dir "go.mod")))
+      (cons 'go-module root)))
 
-;; no tabz
+  (cl-defmethod project-root ((project (head go-module)))
+    (cdr project)))
+
+(use-package magit
+  :ensure t
+  :config
+  (setq auto-revert-buffer-list-filter
+        'magit-auto-revert-repository-buffer-p))
+
+(use-package eglot
+  :ensure t
+  :init
+  (defun eglot-format-buffer-on-save ()
+    (add-hook 'before-save-hook #'eglot-format-buffer -10 t))
+  (add-hook 'project-find-functions #'project-find-go-module))
+
+(use-package go-mode
+  :ensure t
+  :hook ((go-mode . eglot-ensure)
+         (go-mode . eglot-format-buffer-on-save)))
+
+(use-package mermaid-mode
+  :ensure t)
+
+(use-package markdown-mode
+  :ensure t)
+
+(use-package rfc-mode
+  :ensure t)
+
+(use-package yaml-mode
+  :ensure t)
+
+(use-package dockerfile-mode
+  :ensure t)
+
+;; indentz
+(setq js-indent-level 2)
+
+;; tramp stuff
+;; disable VC, magit does the thing:
+;; https://www.gnu.org/software/emacs/manual/html_node/tramp/Frequently-Asked-Questions.html
+(setq vc-handled-backends nil)
+(setq tramp-verbose 1)
+(with-eval-after-load "tramp"
+  (setq tramp-use-ssh-controlmaster-options nil)
+  (add-to-list 'tramp-connection-properties
+               (list (regexp-quote "/ssh:")
+                     "direct-async-process" t)))
+
 (setq-default indent-tabs-mode nil)
+(setq-default column-number-mode 1)
 
-;; paredit stuff
-(add-hook 'clojure-mode-hook 'paredit-mode)
-(add-hook 'emacs-lisp-hook 'paredit-mode)
-
-;; go stuff
-(add-to-list 'exec-path "/usr/local/go/bin")
-(setenv "PATH" (concat (getenv "PATH") ":/usr/local/go/bin"))
-(add-hook 'before-save-hook #'gofmt-before-save)
-
-;; python stuff
-(setq-default blacken-executable "/home/john/.local/bin/black")
-(add-hook 'python-mode-hook 'blacken-mode)
-
-;; rust stuff
-(with-eval-after-load 'rust-mode
-  (add-hook 'flycheck-mode-hook #'flycheck-rust-setup))
-
-;; ocaml/merlin stuff
-
-; Make company aware of merlin
-(with-eval-after-load 'company
- (add-to-list 'company-backends 'merlin-company-backend))
-; Enable company on merlin managed buffers
-(add-hook 'merlin-mode-hook 'company-mode)
-
-;; racket stuff
-(defun setup-racket-mode ()
-  (interactive)
-  (paredit-mode)
-  (bind-keys :map paredit-mode-map
-	     ("{"   . paredit-open-curly)
-	     ("}"   . paredit-close-curly))
-  (unless terminal-frame
-    (bind-keys :map paredit-mode-map
-	       ("M-[" . paredit-wrap-square)
-	       ("M-{" . paredit-wrap-curly))))
-
-(add-hook 'racket-mode-hook #'setup-racket-mode)
-
-;; hate tool bar. i hate it
-(tool-bar-mode -1)
-
-;; magit
-(global-set-key (kbd "C-x g") 'magit-status)
-(global-set-key (kbd "C-x M-g") 'magit-dispatch-popup)
-
-;; terminal
-(defun on-frame-open (frame)
-  (if (not (display-graphic-p frame))
-    (set-face-background 'default "unspecified-bg" frame)))
-(on-frame-open (selected-frame))
-(add-hook 'after-make-frame-functions 'on-frame-open)
+;; mermaid stuff
+(setq mermaid-mmdc-location "/usr/local/bin/docker")
+(setq mermaid-flags "run -u 502 -v /tmp:/tmp ghcr.io/mermaid-js/mermaid-cli/mermaid-cli:9.1.6")
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(auth-source-save-behavior nil)
  '(custom-enabled-themes '(kandinsky))
  '(custom-safe-themes
-   '("26ea4f99a470096bfa6ada7ee97e97e713ec6c9174b37a19e1856bc863024cc5" "9e1d71b9a1a3514fbdac2baea5c35a8c41e19f8c0ba69bc72627ea23265a4d18" "e0fa7a95dd48f0e02ac1fc2d7f9761efe0e5127020a5a30b2a21156764e6b5e3" "c985727ca83a528db20afd9af04a056d16f50820dca81dbe1c58f8d648446a77" default))
- '(flycheck-go-build-executable "/usr/local/go/bin/go")
- '(gofmt-command "/home/john/src/go/bin/goimports")
+   '("d09c75617fa7ba510c0990b0f9e477a0ae0c0791af3f1dd9f4a53ef2d7b299ac" default))
  '(package-selected-packages
-   '(rfc-mode blacken go-mode cider clojure-mode sibilant-mode markdown-mode use-package racket-mode paredit yaml-mode dockerfile-mode flycheck-rust gnugo magit gmpl-mode meadowlands-theme rust-mode protobuf-mode org geiser)))
+   '(dockerfile-mode multi-vterm use-package vterm eglot docker-tramp rfc-mode mermaid-mode markdown-mode flycheck yaml-mode rego-mode go-mode typescript-mode magit))
+ '(warning-suppress-types '((auto-save))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(default ((t (:inherit nil :stipple nil :background "#f6eed4" :foreground "#231b0a" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 80 :width normal :family "xos4 Terminus")))))
-;; ## added by OPAM user-setup for emacs / base ## 56ab50dc8996d2bb95e7856a6eddb17b ## you can edit, but keep this line
-(require 'opam-user-setup "~/.emacs.d/opam-user-setup.el")
-;; ## end of OPAM user-setup addition for emacs / base ## keep this line
+ '(default ((t (:inherit nil :extend nil :stipple nil :background "#f7f4ed" :foreground "#242322" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 100 :width normal :foundry "nil" :family "Monaco")))))
