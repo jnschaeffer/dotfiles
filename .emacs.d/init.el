@@ -1,6 +1,9 @@
 ;; -*- lexical-binding: t; -*-
 (require 'package)
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
+;; Comment/uncomment this line to enable MELPA Stable if desired.  See `package-archive-priorities`
+;; and `package-pinned-packages`. Most users will not need or want to do this.
+;;(add-to-list 'package-archives '("melpa-stable" . "https://stable.melpa.org/packages/") t)
 (package-initialize)
 
 ;; paths
@@ -9,6 +12,9 @@
 
 ;; spellcheck
 (setq ispell-program-name "aspell")
+
+;; general formatting
+(setq-default subword-mode t)
 
 ;; tree sitting
 (setq treesit-language-source-alist
@@ -23,12 +29,13 @@
      (json "https://github.com/tree-sitter/tree-sitter-json")
      (make "https://github.com/alemuller/tree-sitter-make")
      (markdown "https://github.com/ikatyang/tree-sitter-markdown")
+     (nix "https://github.com/nix-community/tree-sitter-nix")
+     (python "https://github.com/tree-sitter/tree-sitter-nix")
      (python "https://github.com/tree-sitter/tree-sitter-python")
      (rust "https://github.com/tree-sitter/tree-sitter-rust" "v0.23.3")
      (toml "https://github.com/tree-sitter/tree-sitter-toml")
      (tsx "https://github.com/tree-sitter/tree-sitter-typescript" "master" "tsx/src")
      (typescript "https://github.com/tree-sitter/tree-sitter-typescript" "master" "typescript/src")
-     (tsx "https://github.com/tree-sitter/tree-sitter-typescript" "master" "tsx/src")
      (yaml "https://github.com/ikatyang/tree-sitter-yaml")))
 
 ;; eglot
@@ -57,6 +64,12 @@
 
 (add-hook 'org-mode-hook 'org-mode-minor-modes)
 
+;; distraction
+(setopt display-time-mode t)
+(setopt display-battery-mode t)
+(setopt display-time-24hr-format t)
+(global-set-key (kbd "C-x m") #'man)
+
 ;; Packages
 (use-package project
   :config
@@ -67,12 +80,6 @@
   :config
   (setq auto-revert-buffer-list-filter
         'magit-auto-revert-repository-buffer-p))
-
-(use-package eglot
-  :ensure t
-  :init
-  (defun eglot-format-buffer-on-save ()
-    (add-hook 'before-save-hook #'eglot-format-buffer -10 t)))
 
 (use-package mermaid-mode
   :ensure t)
@@ -118,28 +125,46 @@
   :ensure t
   :hook (after-init . envrc-global-mode))
 
-;; go stuff
-(add-hook 'go-ts-mode-hook
-          (lambda ()
-            (eglot-ensure)
-            (eglot-format-buffer-on-save)))
+(use-package go-ts-mode
+  :mode "\\.go\\'"
+  :hook
+  (go-ts-mode . eglot-ensure)
+  (before-save-hook . eglot-format-buffer))
 
-;; typescript stuff
-(add-hook 'typescript-ts-mode-hook
-          (lambda ()
-            (eglot-ensure)))
+(use-package go-mod-ts-mode
+  :mode "/go.mod\\'"
+  :hook
+  (go-ts-mode . eglot-ensure)
+  (before-save-hook . eglot-format-buffer))
 
-(add-hook 'tsx-ts-mode-hook
-          (lambda ()
-            (eglot-ensure)))
+(use-package nix-ts-mode
+  :mode "\\.nix\\'")
+
+(use-package consult
+  :ensure t
+  :bind (("M-s g" . consult-git-grep)))
 
 (defun maybe-use-prettier ()
   "Enable `prettier-js-mode' if an rc file is located."
   (if (locate-dominating-file default-directory ".prettierrc")
       (prettier-js-mode +1)))
 
-(add-hook 'typescript-ts-mode-hook
-          'maybe-use-prettier)
+(use-package typescript-ts-mode
+  :mode "\\.ts\\'"
+  :init
+  (add-to-list 'auto-mode-alist '("\\.ts\\'" . typescript-ts-mode))
+  (add-to-list 'auto-mode-alist '("\\.tsx\\'" . tsx-ts-mode))
+  :hook
+  (maybe-use-prettier))
+
+(use-package tsx-ts-mode
+  :mode "\\.tsx\\'"
+  :hook
+  (maybe-use-prettier))
+
+(use-package vterm
+  :ensure t
+  :bind ("C-c v" . vterm))
 
 (setq-default indent-tabs-mode nil)
 (setq-default column-number-mode 1)
@@ -160,8 +185,9 @@
      "d09c75617fa7ba510c0990b0f9e477a0ae0c0791af3f1dd9f4a53ef2d7b299ac"
      default))
  '(package-selected-packages
-   '(dockerfile-mode gnuplot magit markdown-mode mermaid-mode rfc-mode
-                     rust-mode terraform-mode yaml-mode))
+   '(consult dockerfile-mode envrc git-link magit markdown-mode
+             mermaid-mode prettier-js protobuf-mode rfc-mode rust-mode
+             terraform-mode vterm yaml-mode))
  '(warning-suppress-types '((auto-save))))
 
 (custom-set-faces
@@ -169,4 +195,4 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(default ((t (:inherit nil :extend nil :stipple nil :background nil :foreground "#242322" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 100 :width normal :foundry "nil" :family "Noto Mono")))))
+ '(default ((t (:inherit nil :extend nil :stipple nil :background "#f7f3e9" :foreground "#242322" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight regular :height 105 :width normal :foundry "nil" :family "IBM Plex Mono")))))
