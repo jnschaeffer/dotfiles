@@ -1,9 +1,7 @@
 ;; -*- lexical-binding: t; -*-
 (require 'package)
+(push "~/.emacs.d/lisp" load-path)
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
-;; Comment/uncomment this line to enable MELPA Stable if desired.  See `package-archive-priorities`
-;; and `package-pinned-packages`. Most users will not need or want to do this.
-;;(add-to-list 'package-archives '("melpa-stable" . "https://stable.melpa.org/packages/") t)
 (package-initialize)
 
 ;; paths
@@ -45,6 +43,7 @@
         ((rust-mode) "rust-analyzer")))
 
 ;; org
+(require 'ol-man)
 (setq org-agenda-files '("~/org/zet.org"))
 (setq org-refile-targets '(("~/org/zet.org" . (:maxlevel . 5))))
 (setq org-id-link-to-org-use-id t)
@@ -69,6 +68,8 @@
 (setopt display-time-mode t)
 (setopt display-battery-mode t)
 (setopt display-time-24hr-format t)
+(setopt tool-bar-mode nil)
+(setopt menu-bar-mode nil)
 (global-set-key (kbd "C-x m") #'man)
 
 ;; Packages
@@ -116,8 +117,7 @@
 
 (use-package git-link
   :ensure t
-  :init
-  (global-set-key (kbd "C-c g l") 'git-link))
+  :bind (("C-c g l" . git-link)))
 
 (use-package protobuf-mode
   :ensure t)
@@ -128,15 +128,18 @@
 
 (use-package go-ts-mode
   :mode "\\.go\\'"
-  :hook
-  (go-ts-mode . eglot-ensure)
-  (before-save-hook . eglot-format-buffer))
+  :ensure t
+  :hook ((go-ts-mode . eglot-ensure)
+         (before-save . eglot-format-buffer)))
 
 (use-package go-mod-ts-mode
   :mode "/go.mod\\'"
   :hook
   (go-ts-mode . eglot-ensure)
   (before-save-hook . eglot-format-buffer))
+
+(use-package man
+  :bind (("C-c m" . man)))
 
 (use-package nix-ts-mode
   :mode "\\.nix\\'")
@@ -174,6 +177,7 @@
 (setq mermaid-mmdc-location "/usr/local/bin/docker")
 (setq mermaid-flags "run -u 502 --rm -v /tmp:/tmp ghcr.io/mermaid-js/mermaid-cli/mermaid-cli:11.4.0 --theme neutral")
 
+;; set a default font size
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -185,10 +189,7 @@
    '("26ea4f99a470096bfa6ada7ee97e97e713ec6c9174b37a19e1856bc863024cc5"
      "d09c75617fa7ba510c0990b0f9e477a0ae0c0791af3f1dd9f4a53ef2d7b299ac"
      default))
- '(package-selected-packages
-   '(consult dockerfile-mode envrc git-link magit markdown-mode
-             mermaid-mode prettier-js protobuf-mode rfc-mode rust-mode
-             terraform-mode vterm yaml-mode))
+ '(package-selected-packages nil)
  '(warning-suppress-types '((auto-save))))
 
 (custom-set-faces
@@ -196,4 +197,4 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(default ((t (:inherit nil :extend nil :stipple nil :background "#f7f3e9" :foreground "#242322" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight regular :height 105 :width normal :foundry "nil" :family "IBM Plex Mono")))))
+ '(default ((t (:inherit nil :extend nil :stipple nil :background "#f7f3e9" :foreground "#242322" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight regular :height 85 :width normal :foundry "IBM " :family "IBM Plex Mono")))))
