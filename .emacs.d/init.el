@@ -49,20 +49,21 @@
 (setq org-refile-targets '(("~/org/zet.org" . (:maxlevel . 5))))
 (setq org-id-link-to-org-use-id t)
 (setq org-agenda-restore-windows-after-quit t)
+(setq org-agenda-follow-indirect t)
+(setq org-agenda-start-with-follow-mode t)
 (setq org-capture-templates
       '(("a" "Analysis" entry (file+headline "~/org/zet.org" "Unfiled") "* %^{Title}\n:PROPERTIES:\n:ID: %(org-id-new)\n:TIMESTAMP: %t\n:END:\n\n%?")
+        ("f" "File" entry (file+headline "~/org/zet.org" "Unfiled") "* %^{Title} (%f)\n:PROPERTIES:\n:ID: %(org-id-new)\n:TIMESTAMP: %t\n:END:\n\n%?\n\n[[%L][Source]]")
         ("l" "Link" entry (file+headline "~/org/zet.org" "Unfiled") "* %^{Title}\n:PROPERTIES:\n:ID: %(org-id-new)\n:TIMESTAMP: %t\n:END:\n\n%?\n\n[[%^{URL}][Source]]")
-        ("r" "Reference" entry (file+headline "~/org/zet.org" "Unfiled") "* %^{Title} (%f)\n:PROPERTIES:\n:ID: %(org-id-new)\n:TIMESTAMP: %t\n:END:\n\n%?\n\n[[%L][Source]]")))
+        ("r" "Reference" entry (file+headline "~/org/zet.org" "Unfiled") "* %^{Title}\n:PROPERTIES:\n:ID: %(org-id-new)\n:TIMESTAMP: %t\n:END:\n\n%?\n\n[[%L][Source]]")))
 
-(global-set-key (kbd "C-c l") #'org-store-link)
-(global-set-key (kbd "C-c a") #'org-agenda)
-(global-set-key (kbd "C-c c") #'org-capture)
-
-(defun org-mode-minor-modes ()
-  (require 'ox-md)
-  (visual-line-mode))
-
-(add-hook 'org-mode-hook 'org-mode-minor-modes)
+(use-package org
+  :hook
+  ((org-mode . visual-line-mode))
+  :bind
+  (("C-c l" . org-store-link)
+   ("C-c a" . org-agenda)
+   ("C-c c" . org-capture)))
 
 ;; distraction
 (setopt display-time-mode t)
@@ -151,21 +152,21 @@
 
 (use-package typescript-ts-mode
   :mode "\\.ts\\'"
-  :init
-  (add-to-list 'auto-mode-alist '("\\.ts\\'" . typescript-ts-mode))
-  (add-to-list 'auto-mode-alist '("\\.tsx\\'" . tsx-ts-mode))
   :hook
-  (maybe-use-prettier))
+  ((typescript-ts-mode . maybe-use-prettier)
+   (typescript-ts-mode . (lambda () (setq tab-width 2)))))
 
 (use-package tsx-ts-mode
   :mode "\\.tsx\\'"
   :hook
-  (maybe-use-prettier))
+  ((typescript-tsx-mode . maybe-use-prettier)
+   (typescript-tsx-mode . (lambda () (setq tab-width 2)))))
 
 (use-package vterm
   :ensure t
   :bind ("C-c v" . vterm))
 
+(setq-default js-indent-level 2)
 (setq-default indent-tabs-mode nil)
 (setq-default column-number-mode 1)
 
