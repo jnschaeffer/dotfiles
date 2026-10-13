@@ -26,7 +26,8 @@
      (javascript "https://github.com/tree-sitter/tree-sitter-javascript" "v0.23.3" "src")
      (json "https://github.com/tree-sitter/tree-sitter-json")
      (make "https://github.com/alemuller/tree-sitter-make")
-     (markdown "https://github.com/ikatyang/tree-sitter-markdown")
+     (markdown "https://github.com/tree-sitter-grammars/tree-sitter-markdown" "v0.2.3" "tree-sitter-markdown/src")
+     (markdown-inline "https://github.com/tree-sitter-grammars/tree-sitter-markdown" "v0.2.3" "tree-sitter-markdown-inline/src")
      (nix "https://github.com/nix-community/tree-sitter-nix")
      (python "https://github.com/tree-sitter/tree-sitter-nix")
      (python "https://github.com/tree-sitter/tree-sitter-python")
@@ -57,6 +58,8 @@
         ("r" "Reference" entry (file+headline "~/org/zet.org" "Unfiled") "* %^{Title}\n:PROPERTIES:\n:ID: %(org-id-new)\n:TIMESTAMP: %t\n:END:\n\n%?\n\n[[%L][Source]]")))
 
 (use-package org
+  :config
+  (require 'ox-md)
   :hook
   ((org-mode . visual-line-mode))
   :bind
@@ -65,12 +68,56 @@
    ("C-c c" . org-capture)))
 
 ;; distraction
+
 (setopt display-time-mode t)
 (setopt display-battery-mode t)
 (setopt display-time-24hr-format t)
 (setopt tool-bar-mode nil)
 (setopt menu-bar-mode nil)
 (global-set-key (kbd "C-x m") #'man)
+
+;; tramp
+
+(setq system-auth-sources '((gnu/linux . (:source (:secrets "Login")))
+                            (darwin . (:source (:macos-generic-keychain "")))))
+
+(defun choose-auth-sources ()
+  "Chooses an appropriate value for auth-sources based on system-type. If
+no source exists for the current system type, the function returns the
+default value for auth-sources."
+  (let ((system-source (alist-get system-type system-auth-sources)))
+    (if system-source
+        (list system-source)
+      '("~/.authinfo" "~/.authinfo.gpg" "~/.netrc"))))
+
+(setq auth-sources (choose-auth-sources))
+
+;; AI
+
+(defun pilish-sandbox ()
+  (let* ((proj (project-current))
+         (proj-root (if proj (project-root proj) default-directory))
+         (root-path (expand-file-name proj-root)))
+    `("bwrap"
+      "--ro-bind" "/usr" "/usr"
+      "--symlink" "/usr/bin" "/bin"
+      "--symlink" "/usr/lib" "/lib"
+      "--symlink" "/usr/lib64" "/lib64"
+      "--dev" "/dev"
+      "--ro-bind" "/etc" "/etc"
+      "--ro-bind" "/home/john/.nvm" "/home/john/.nvm"
+      "--ro-bind" "/home/john/.local/bin" "/home/john/.local/bin"
+      "--ro-bind" "/home/john/.kube/config" "/home/john/.kube/config"
+      "--ro-bind" "/home/john/.minikube" "/home/john/.minikube"
+      "--bind" "/home/john/.pi" "/home/john/.pi"
+      "--bind" ,root-path ,root-path
+      "--chdir" ,root-path
+      "--"
+      "pi")))
+
+(advice-add 'pilish :before
+            (lambda (&rest _)
+              (setq pilish-executable (pilish-sandbox))))
 
 ;; Packages
 (use-package project
@@ -87,7 +134,9 @@
   :ensure t)
 
 (use-package markdown-mode
-  :ensure t)
+  :ensure t
+  :hook
+  ((markdown-mode . visual-line-mode)))
 
 (use-package rfc-mode
   :ensure t)
@@ -139,7 +188,7 @@
   (before-save-hook . eglot-format-buffer))
 
 (use-package man
-  :bind (("C-c m" . man)))
+  :bind (("C-x m" . man)))
 
 (use-package nix-ts-mode
   :mode "\\.nix\\'")
@@ -167,7 +216,10 @@
 
 (use-package vterm
   :ensure t
-  :bind ("C-c v" . vterm))
+  :bind ("C-x v" . vterm))
+
+(use-package pilish
+  :ensure t)
 
 (setq-default js-indent-level 2)
 (setq-default indent-tabs-mode nil)
@@ -183,13 +235,19 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(auth-source-save-behavior nil)
  '(custom-enabled-themes '(kandinsky))
  '(custom-safe-themes
-   '("26ea4f99a470096bfa6ada7ee97e97e713ec6c9174b37a19e1856bc863024cc5"
+   '("5fae372b34cd430facfda55f43b54e6971c2aef458c455537a3f689f2b4f18c8"
+     "26ea4f99a470096bfa6ada7ee97e97e713ec6c9174b37a19e1856bc863024cc5"
      "d09c75617fa7ba510c0990b0f9e477a0ae0c0791af3f1dd9f4a53ef2d7b299ac"
      default))
- '(package-selected-packages nil)
+ '(package-selected-packages
+   '(consult dockerfile-mode envrc git-link magit markdown-mode
+             mermaid-mode pilish prettier-js protobuf-mode rfc-mode
+             rust-mode terraform-mode vterm yaml-mode))
+ '(pi-coding-agent-grammar-declined-set
+   '(c cpp ruby java lua dockerfile c-sharp clojure elixir haskell heex
+       kotlin php scala))
  '(warning-suppress-types '((auto-save))))
 
 (custom-set-faces

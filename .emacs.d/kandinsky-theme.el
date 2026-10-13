@@ -30,25 +30,41 @@
 
  (deftheme kandinsky)
  (let ((class '((class color) (min-colors 89)))
-       (fg1 "#242322")
-       (fg2 "#333231")
-       (fg3 "#424140")
-       (fg4 "#525150")
-       (bg1 "#f7f3e9")
-       (bg2 "#e1ded8")
-       (bg3 "#cbc9c3")
-       (bg4 "#b6b3ae")
-       (key2 "#6d8642")
-       (key3 "#516a28")
-       (builtin "#b61e04")
-       (keyword "#5b782c")
-       (const   "#4692b9")
-       (comment "#808080")
-       (func    "#b61e04")
-       (str     "#562f59")
-       (type    "#0e5f82")
-       (var     "#242322")
-       (warning "#ad6921"))
+       (fg1 "#242322")      ;; dark gray
+       (fg2 "#333231")      ;; dark gray
+       (fg3 "#424140")      ;; dark gray
+       (fg4 "#525150")      ;; dark gray
+       (bg1 "#f7f3e9")      ;; light gray
+       (bg2 "#e1ded8")      ;; light gray
+       (bg3 "#cbc9c3")      ;; light gray
+       (bg4 "#b6b3ae")      ;; light gray
+       (key2 "#6d8642")     ;; green
+       (key3 "#516a28")     ;; green
+       (builtin "#b61e04")  ;; red
+       (keyword "#5b782c")  ;; green
+       (const   "#4692b9")  ;; bright blue
+       (comment "#808080")  ;; gray
+       (func    "#b61e04")  ;; red
+       (str     "#562f59")  ;; magenta
+       (type    "#0e5f82")  ;; blue
+       (var     "#242322")  ;; dark gray
+       (warning "#ad6921")  ;; yellow
+       (black "#2a2526")
+       (brightblack "#373b41")
+       (red     "#b61e04")
+       (brightred "#c12b04")
+       (green "#5b782c")
+       (brightgreen "#5d8712")
+       (yellow "#ad6921")
+       (brightyellow "#dfaf49")
+       (blue "#0e5f82")
+       (brightblue "#4692b9")
+       (magenta "#562f59")
+       (brightmagenta "#86719b")
+       (cyan "#488876")
+       (brightcyan "#5bac95")
+       (white "#d4d4d4")
+       (brightwhite "#f1e7db"))
    (custom-theme-set-faces
    'kandinsky
         `(default ((,class (:background ,bg1 :foreground ,fg1))))
@@ -172,14 +188,22 @@
         `(magit-diff-file-header ((,class (:foreground ,fg2 :background ,bg3))))
         `(lazy-highlight ((,class (:foreground ,fg2 :background ,bg3))))
         `(term ((,class (:foreground ,fg1 :background ,bg1))))
-        `(term-color-black ((,class (:foreground ,bg3 :background ,bg3))))
-        `(term-color-blue ((,class (:foreground ,func :background ,func))))
-        `(term-color-red ((,class (:foreground ,keyword :background ,bg3))))
-        `(term-color-green ((,class (:foreground ,type :background ,bg3))))
-        `(term-color-yellow ((,class (:foreground ,var :background ,var))))
-        `(term-color-magenta ((,class (:foreground ,builtin :background ,builtin))))
-        `(term-color-cyan ((,class (:foreground ,str :background ,str))))
-        `(term-color-white ((,class (:foreground ,fg2 :background ,fg2))))
+        `(term-color-black ((,class (:foreground ,black :background ,black))))
+        `(term-color-blue ((,class (:foreground ,blue :background ,blue))))
+        `(term-color-red ((,class (:foreground ,red :background ,red))))
+        `(term-color-green ((,class (:foreground ,green :background ,green))))
+        `(term-color-yellow ((,class (:foreground ,yellow :background ,yellow))))
+        `(term-color-magenta ((,class (:foreground ,magenta :background ,magenta))))
+        `(term-color-cyan ((,class (:foreground ,cyan :background ,cyan))))
+        `(term-color-white ((,class (:foreground ,white :background ,white))))
+        `(term-color-bright-black ((,class (:foreground ,brightblack :background ,brightblack))))
+        `(term-color-bright-blue ((,class (:foreground ,brightblue :background ,brightblue))))
+        `(term-color-bright-red ((,class (:foreground ,brightred :background ,brightred))))
+        `(term-color-bright-green ((,class (:foreground ,brightgreen :background ,brightgreen))))
+        `(term-color-bright-yellow ((,class (:foreground ,brightyellow :background ,brightyellow))))
+        `(term-color-bright-magenta ((,class (:foreground ,brightmagenta :background ,brightmagenta))))
+        `(term-color-bright-cyan ((,class (:foreground ,brightcyan :background ,brightcyan))))
+        `(term-color-bright-white ((,class (:foreground ,brightwhite :background ,brightwhite))))
         `(rainbow-delimiters-unmatched-face ((,class :foreground ,warning)))
         `(helm-header ((,class (:foreground ,fg2 :background ,bg1 :underline nil :box nil))))
         `(helm-source-header ((,class (:foreground ,keyword :background ,bg1 :underline nil :weight bold))))

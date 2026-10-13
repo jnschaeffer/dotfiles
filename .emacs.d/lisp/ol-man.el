@@ -27,7 +27,7 @@
       (match-string 1 (buffer-name))
     (error "cannot get page name")))
 
-(defun org-man-export (link description format _)
+(defun org-man-export (link description format)
   "Export a man page link from Org files."
   (let ((path (format "http://man.he.net/?topic=%s&section=all" link))
         (desc (or description link)))
@@ -36,6 +36,7 @@
       (`latex (format "\\href{%s}{%s}" path desc))
       (`texinfo (format "@uref{%s,%s}" path desc))
       (`ascii (format "%s (%s)" desc path))
+      (`md (format "[%s](%s)" desc path))
       (_ path))))
 
 (provide 'ol-man)
