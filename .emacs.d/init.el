@@ -6,13 +6,17 @@
 
 ;; paths
 (setenv "PATH" (concat (getenv "PATH") ":~/go/bin:/nix/var/nix/profiles/default/bin"))
-(setq exec-path (append exec-path '("~/go/bin" "/nix/var/nix/profiles/default/bin/nix")))
+(setopt exec-path (append exec-path '("~/go/bin" "/nix/var/nix/profiles/default/bin/nix")))
+
+;; shells
+(setq system-shells '((gnu/linux . "/bin/bash")
+                      (darwin . "/opt/homebrew/bin/bash")))
 
 ;; spellcheck
-(setq ispell-program-name "aspell")
+(setopt ispell-program-name "aspell")
 
 ;; general formatting
-(setq-default subword-mode t)
+(setq subword-mode t)
 
 ;; tree sitting
 (setq treesit-language-source-alist
@@ -45,17 +49,17 @@
 
 ;; org
 (require 'ol-man)
-(setq org-agenda-files '("~/org/zet.org"))
-(setq org-refile-targets '(("~/org/zet.org" . (:maxlevel . 5))))
-(setq org-id-link-to-org-use-id t)
-(setq org-agenda-restore-windows-after-quit t)
-(setq org-agenda-follow-indirect t)
-(setq org-agenda-start-with-follow-mode t)
-(setq org-capture-templates
-      '(("a" "Analysis" entry (file+headline "~/org/zet.org" "Unfiled") "* %^{Title}\n:PROPERTIES:\n:ID: %(org-id-new)\n:TIMESTAMP: %t\n:END:\n\n%?")
-        ("f" "File" entry (file+headline "~/org/zet.org" "Unfiled") "* %^{Title} (%f)\n:PROPERTIES:\n:ID: %(org-id-new)\n:TIMESTAMP: %t\n:END:\n\n%?\n\n[[%L][Source]]")
-        ("l" "Link" entry (file+headline "~/org/zet.org" "Unfiled") "* %^{Title}\n:PROPERTIES:\n:ID: %(org-id-new)\n:TIMESTAMP: %t\n:END:\n\n%?\n\n[[%^{URL}][Source]]")
-        ("r" "Reference" entry (file+headline "~/org/zet.org" "Unfiled") "* %^{Title}\n:PROPERTIES:\n:ID: %(org-id-new)\n:TIMESTAMP: %t\n:END:\n\n%?\n\n[[%L][Source]]")))
+(setopt org-agenda-files '("~/org/zet.org"))
+(setopt org-refile-targets '(("~/org/zet.org" . (:maxlevel . 5))))
+(setopt org-id-link-to-org-use-id t)
+(setopt org-agenda-restore-windows-after-quit t)
+(setopt org-agenda-follow-indirect t)
+(setopt org-agenda-start-with-follow-mode t)
+(setopt org-capture-templates
+        '(("a" "Analysis" entry (file+headline "~/org/zet.org" "Unfiled") "* %^{Title}\n:PROPERTIES:\n:ID: %(org-id-new)\n:TIMESTAMP: %t\n:END:\n\n%?")
+          ("f" "File" entry (file+headline "~/org/zet.org" "Unfiled") "* %^{Title} (%f)\n:PROPERTIES:\n:ID: %(org-id-new)\n:TIMESTAMP: %t\n:END:\n\n%?\n\n[[%L][Source]]")
+          ("l" "Link" entry (file+headline "~/org/zet.org" "Unfiled") "* %^{Title}\n:PROPERTIES:\n:ID: %(org-id-new)\n:TIMESTAMP: %t\n:END:\n\n%?\n\n[[%^{URL}][Source]]")
+          ("r" "Reference" entry (file+headline "~/org/zet.org" "Unfiled") "* %^{Title}\n:PROPERTIES:\n:ID: %(org-id-new)\n:TIMESTAMP: %t\n:END:\n\n%?\n\n[[%L][Source]]")))
 
 (use-package org
   :config
@@ -63,37 +67,25 @@
   :hook
   ((org-mode . visual-line-mode))
   :bind
-  (("C-c l" . org-store-link)
-   ("C-c a" . org-agenda)
-   ("C-c c" . org-capture)))
+  (("C-c o l" . org-store-link)
+   ("C-c o a" . org-agenda)
+   ("C-c o c" . org-capture)))
 
 ;; distraction
-
 (setopt display-time-mode t)
 (setopt display-battery-mode t)
 (setopt display-time-24hr-format t)
 (setopt tool-bar-mode nil)
 (setopt menu-bar-mode nil)
-(global-set-key (kbd "C-x m") #'man)
+(global-set-key (kbd "C-c m") #'man)
 
-;; tramp
-
+;; auth
 (setq system-auth-sources '((gnu/linux . (:source (:secrets "Login")))
                             (darwin . (:source (:macos-generic-keychain "")))))
 
-(defun choose-auth-sources ()
-  "Chooses an appropriate value for auth-sources based on system-type. If
-no source exists for the current system type, the function returns the
-default value for auth-sources."
-  (let ((system-source (alist-get system-type system-auth-sources)))
-    (if system-source
-        (list system-source)
-      '("~/.authinfo" "~/.authinfo.gpg" "~/.netrc"))))
-
-(setq auth-sources (choose-auth-sources))
+(setopt auth-sources (alist-get system-type system-auth-sources '("~/.authinfo")))
 
 ;; AI
-
 (defun pilish-sandbox ()
   (let* ((proj (project-current))
          (proj-root (if proj (project-root proj) default-directory))
@@ -117,18 +109,18 @@ default value for auth-sources."
 
 (advice-add 'pilish :before
             (lambda (&rest _)
-              (setq pilish-executable (pilish-sandbox))))
+              (setopt pilish-executable (pilish-sandbox))))
 
 ;; Packages
 (use-package project
   :config
-  (setq project-vc-extra-root-markers '("Cargo.toml" "go.mod" "tsconfig.json")))
+  (setopt project-vc-extra-root-markers '("Cargo.toml" "go.mod" "tsconfig.json")))
 
 (use-package magit
   :ensure t
   :config
-  (setq auto-revert-buffer-list-filter
-        'magit-auto-revert-repository-buffer-p))
+  (setopt auto-revert-buffer-list-filter
+          'magit-auto-revert-repository-buffer-p))
 
 (use-package mermaid-mode
   :ensure t)
@@ -157,16 +149,16 @@ default value for auth-sources."
 (use-package terraform-mode
   :ensure t
   :init
-  (setq terraform-command "tofu"))
+  (setopt terraform-command "tofu"))
 
 (use-package prettier-js
   :ensure t
   :init
-  (setq prettier-js-use-modules-bin t))
+  (setopt prettier-js-use-modules-bin t))
 
 (use-package git-link
   :ensure t
-  :bind (("C-c g l" . git-link)))
+  :bind (("C-c l" . git-link)))
 
 (use-package protobuf-mode
   :ensure t)
@@ -188,7 +180,7 @@ default value for auth-sources."
   (before-save-hook . eglot-format-buffer))
 
 (use-package man
-  :bind (("C-x m" . man)))
+  :bind (("C-c m" . man)))
 
 (use-package nix-ts-mode
   :mode "\\.nix\\'")
@@ -216,18 +208,19 @@ default value for auth-sources."
 
 (use-package vterm
   :ensure t
-  :bind ("C-x v" . vterm))
+  :bind ("C-c v" . vterm)
+  :init (setopt vterm-shell (alist-get system-type system-shells "/bin/bash")))
 
 (use-package pilish
   :ensure t)
 
-(setq-default js-indent-level 2)
-(setq-default indent-tabs-mode nil)
-(setq-default column-number-mode 1)
+(setopt js-indent-level 2)
+(setopt indent-tabs-mode nil)
+(setopt column-number-mode t)
 
-;; mermaid stuff
-(setq mermaid-mmdc-location "/usr/local/bin/docker")
-(setq mermaid-flags "run -u 502 --rm -v /tmp:/tmp ghcr.io/mermaid-js/mermaid-cli/mermaid-cli:11.4.0 --theme neutral")
+;; mermaid
+(setopt mermaid-mmdc-location "/usr/local/bin/docker")
+(setopt mermaid-flags "run -u 502 --rm -v /tmp:/tmp ghcr.io/mermaid-js/mermaid-cli/mermaid-cli:11.4.0 --theme neutral")
 
 ;; set a default font size
 (custom-set-variables
@@ -237,7 +230,8 @@ default value for auth-sources."
  ;; If there is more than one, they won't work right.
  '(custom-enabled-themes '(kandinsky))
  '(custom-safe-themes
-   '("5fae372b34cd430facfda55f43b54e6971c2aef458c455537a3f689f2b4f18c8"
+   '("69b3d2c69408ff11b10d694e5c6c36d4cddfa6cd7c8d810f860e82de71006a80"
+     "5fae372b34cd430facfda55f43b54e6971c2aef458c455537a3f689f2b4f18c8"
      "26ea4f99a470096bfa6ada7ee97e97e713ec6c9174b37a19e1856bc863024cc5"
      "d09c75617fa7ba510c0990b0f9e477a0ae0c0791af3f1dd9f4a53ef2d7b299ac"
      default))
