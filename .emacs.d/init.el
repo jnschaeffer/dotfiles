@@ -80,10 +80,16 @@
 (global-set-key (kbd "C-c m") #'man)
 
 ;; auth
-(setq system-auth-sources '((gnu/linux . (:source (:secrets "Login")))
-                            (darwin . (:source (:macos-generic-keychain "")))))
+(setq system-auth-sources '((gnu/linux . ((:source (:secrets "Login"))))
+                            (darwin . ((:source (:macos-keychain-internet "default"))))))
 
 (setopt auth-sources (alist-get system-type system-auth-sources '("~/.authinfo")))
+(setopt auth-source-debug t)
+(setopt auth-source-do-cache nil)
+
+;; tramp
+(setopt tramp-default-method "smb")
+(setopt tramp-default-user "john")
 
 ;; AI
 (defun pilish-sandbox ()
