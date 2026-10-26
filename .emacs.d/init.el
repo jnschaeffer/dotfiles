@@ -49,17 +49,18 @@
 
 ;; org
 (require 'ol-man)
-(setopt org-agenda-files '("~/org/zet.org"))
-(setopt org-refile-targets '(("~/org/zet.org" . (:maxlevel . 5))))
+(setq zet-file "/Volumes/home/Drive/org/zet.org")
+(setopt org-agenda-files `(,zet-file))
+(setopt org-refile-targets `((,zet-file . (:maxlevel . 5))))
 (setopt org-id-link-to-org-use-id t)
 (setopt org-agenda-restore-windows-after-quit t)
 (setopt org-agenda-follow-indirect t)
 (setopt org-agenda-start-with-follow-mode t)
 (setopt org-capture-templates
-        '(("a" "Analysis" entry (file+headline "~/org/zet.org" "Unfiled") "* %^{Title}\n:PROPERTIES:\n:ID: %(org-id-new)\n:TIMESTAMP: %t\n:END:\n\n%?")
-          ("f" "File" entry (file+headline "~/org/zet.org" "Unfiled") "* %^{Title} (%f)\n:PROPERTIES:\n:ID: %(org-id-new)\n:TIMESTAMP: %t\n:END:\n\n%?\n\n[[%L][Source]]")
-          ("l" "Link" entry (file+headline "~/org/zet.org" "Unfiled") "* %^{Title}\n:PROPERTIES:\n:ID: %(org-id-new)\n:TIMESTAMP: %t\n:END:\n\n%?\n\n[[%^{URL}][Source]]")
-          ("r" "Reference" entry (file+headline "~/org/zet.org" "Unfiled") "* %^{Title}\n:PROPERTIES:\n:ID: %(org-id-new)\n:TIMESTAMP: %t\n:END:\n\n%?\n\n[[%L][Source]]")))
+        `(("a" "Analysis" entry (file+headline ,zet-file "Unfiled") "* %^{Title}\n:PROPERTIES:\n:ID: %(org-id-new)\n:TIMESTAMP: %t\n:END:\n\n%?")
+          ("f" "File" entry (file+headline ,zet-file "Unfiled") "* %^{Title} (%f)\n:PROPERTIES:\n:ID: %(org-id-new)\n:TIMESTAMP: %t\n:END:\n\n%?\n\n[[%L][Source]]")
+          ("l" "Link" entry (file+headline ,zet-file "Unfiled") "* %^{Title}\n:PROPERTIES:\n:ID: %(org-id-new)\n:TIMESTAMP: %t\n:END:\n\n%?\n\n[[%^{URL}][Source]]")
+          ("r" "Reference" entry (file+headline ,zet-file "Unfiled") "* %^{Title}\n:PROPERTIES:\n:ID: %(org-id-new)\n:TIMESTAMP: %t\n:END:\n\n%?\n\n[[%L][Source]]")))
 
 (use-package org
   :config
@@ -80,16 +81,11 @@
 (global-set-key (kbd "C-c m") #'man)
 
 ;; auth
-(setq system-auth-sources '((gnu/linux . ((:source (:secrets "Login"))))
-                            (darwin . ((:source (:macos-keychain-internet "default"))))))
-
-(setopt auth-sources (alist-get system-type system-auth-sources '("~/.authinfo")))
+(setq system-auth-sources '(gnu/linux ((:source (:secrets "Login")))
+                            darwin ((:source (:macos-keychain-internet "default")))))
+(setopt auth-sources (or (plist-get system-auth-sources system-type) '("~/.authinfo")))
 (setopt auth-source-debug t)
 (setopt auth-source-do-cache nil)
-
-;; tramp
-(setopt tramp-default-method "smb")
-(setopt tramp-default-user "john")
 
 ;; AI
 (defun pilish-sandbox ()
@@ -182,8 +178,8 @@
 (use-package go-mod-ts-mode
   :mode "/go.mod\\'"
   :hook
-  (go-ts-mode . eglot-ensure)
-  (before-save-hook . eglot-format-buffer))
+  ((go-ts-mode . eglot-ensure)
+   (before-save . eglot-format-buffer)))
 
 (use-package man
   :bind (("C-c m" . man)))
@@ -255,4 +251,4 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(default ((t (:inherit nil :extend nil :stipple nil :background "#f7f3e9" :foreground "#242322" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight regular :height 85 :width normal :foundry "IBM " :family "IBM Plex Mono")))))
+ '(default ((t (:inherit nil :extend nil :stipple nil :background "#f7f3e9" :foreground "#242322" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight regular :height 95 :width normal :foundry "IBM " :family "IBM Plex Mono")))))
