@@ -1,6 +1,5 @@
 ;; -*- lexical-binding: t; -*-
 (require 'package)
-(push "~/.emacs.d/lisp" load-path)
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
 (package-initialize)
 
