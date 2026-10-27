@@ -3,10 +3,6 @@
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
 (package-initialize)
 
-;; paths
-(setenv "PATH" (concat (getenv "PATH") ":~/go/bin:/nix/var/nix/profiles/default/bin"))
-(setopt exec-path (append exec-path '("~/go/bin" "/nix/var/nix/profiles/default/bin/nix")))
-
 ;; shells
 (setq system-shells '((gnu/linux . "/bin/bash")
                       (darwin . "/opt/homebrew/bin/bash")))
@@ -47,8 +43,7 @@
         ((rust-mode) "rust-analyzer")))
 
 ;; org
-(require 'ol-man)
-(setq zet-file "/Volumes/home/Drive/org/zet.org")
+(setq zet-file "~/org/zet.org")
 (setopt org-agenda-files `(,zet-file))
 (setopt org-refile-targets `((,zet-file . (:maxlevel . 5))))
 (setopt org-id-link-to-org-use-id t)
@@ -113,6 +108,11 @@
               (setopt pilish-executable (pilish-sandbox))))
 
 ;; Packages
+(use-package exec-path-from-shell
+  :ensure t
+  :init
+  (exec-path-from-shell-initialize))
+
 (use-package project
   :config
   (setopt project-vc-extra-root-markers '("Cargo.toml" "go.mod" "tsconfig.json")))
@@ -237,9 +237,10 @@
      "d09c75617fa7ba510c0990b0f9e477a0ae0c0791af3f1dd9f4a53ef2d7b299ac"
      default))
  '(package-selected-packages
-   '(consult dockerfile-mode envrc git-link magit markdown-mode
-             mermaid-mode pilish prettier-js protobuf-mode rfc-mode
-             rust-mode terraform-mode vterm yaml-mode))
+   '(consult dockerfile-mode envrc exec-path-from-shell git-link magit
+             markdown-mode mermaid-mode pilish prettier-js
+             protobuf-mode rfc-mode rust-mode terraform-mode vterm
+             yaml-mode))
  '(pi-coding-agent-grammar-declined-set
    '(c cpp ruby java lua dockerfile c-sharp clojure elixir haskell heex
        kotlin php scala))
@@ -250,4 +251,4 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(default ((t (:inherit nil :extend nil :stipple nil :background "#f7f3e9" :foreground "#242322" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight regular :height 95 :width normal :foundry "IBM " :family "IBM Plex Mono")))))
+ '(default ((t (:inherit nil :extend nil :stipple nil :background "#f7f3e9" :foreground "#242322" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight regular :height 105 :width normal :foundry "IBM" :family "IBM Plex Mono")))))
